@@ -11,7 +11,10 @@ public class JStream {
         jsonObject = new JSONObject();
     }
 
-    private Class<?> fromJson(String jsonString){
+    public Class<?> fromJson(String jsonString,Class<?> clazz){
+        jsonObject = new JSONObject(jsonString);
+
+        System.out.println(jsonObject);
         return null;
     }
 

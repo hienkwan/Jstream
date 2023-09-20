@@ -3,31 +3,50 @@ package JStream;
 import Reflection.JsonProperty;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class JSONObject{
+public class JSONObject {
     private Map<String, Object> data;
 
     public JSONObject() {
         data = new HashMap<>();
     }
 
-    public JSONObject(String jsonString){
+    public JSONObject(String jsonString) {
+        jsonString = jsonString.replace("{", "");
+        jsonString = jsonString.replace("}", "");
 
+        List<String> pairFields = List.of(jsonString.split(","));
+        data = new HashMap<>();
+        for (String kvPair : pairFields) {
+            int firstIndexOfDoubleQuote = kvPair.indexOf("\"");
+            int secondIndexOfDoubleQuote = kvPair.indexOf("\"", firstIndexOfDoubleQuote + 1);
+            String key = kvPair.substring(firstIndexOfDoubleQuote + 1, secondIndexOfDoubleQuote);
+            int indexOfDoubleQuoteOfValue = kvPair.indexOf("\"", secondIndexOfDoubleQuote + 1);
+            String value = null;
+            if (indexOfDoubleQuoteOfValue != -1) {
+                int firstIndexOfDoubleQuoteForValue = indexOfDoubleQuoteOfValue;
+                int secondIndexOfDoubleQuoteForValue = kvPair.indexOf("\"", firstIndexOfDoubleQuoteForValue + 1);
+                value = kvPair.substring(firstIndexOfDoubleQuoteForValue + 1, secondIndexOfDoubleQuoteForValue);
+            }
+            data.put(key, value);
+        }
     }
 
     public JSONObject toJSONObject(Object instance) throws IllegalAccessException {
-        Class<?> tClass = instance.getClass();
-        for(var field : tClass.getDeclaredFields()){
+        Class<?> clazz = instance.getClass();
+        for (var field : clazz.getDeclaredFields()) {
             var annotation = field.getAnnotation(JsonProperty.class);
             field.setAccessible(true);
             Object value = field.get(instance);
 
             String name = "";
-            if(annotation!=null){
+            if (annotation != null) {
                 name = annotation.name();
-                put(name,value);
+                put(name, value);
             }
+
         }
         return this;
     }
@@ -40,12 +59,18 @@ public class JSONObject{
         return data.get(key);
     }
 
-    public boolean has(String key){
+    public boolean has(String key) {
         return data.containsKey(key);
     }
 
-    public String fromJsonString(String str){
-        return "";
+
+    public Object fromJson(Class<?> clazz) {
+
+
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+
+        }
+        return null;
     }
 
     public String toJsonString() {
@@ -71,4 +96,13 @@ public class JSONObject{
         return json.toString();
     }
 
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        for (Map.Entry<String, Object> entry : data.entrySet()) {
+            result.append(entry.getKey()).append(" : ").append(entry.getValue());
+            result.append("\n");
+        }
+        return result.toString();
+    }
 }
