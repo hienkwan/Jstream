@@ -11,11 +11,10 @@ public class JStream {
         jsonObject = new JSONObject();
     }
 
-    public Class<?> fromJson(String jsonString,Class<?> clazz){
+    public <T> T fromJson(String jsonString,Class<?> clazz){
         jsonObject = new JSONObject(jsonString);
 
-        System.out.println(jsonObject);
-        return null;
+        return (T) jsonObject.fromJson(clazz);
     }
 
     public  String toJson(Object instance) throws IllegalAccessException {

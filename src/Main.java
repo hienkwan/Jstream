@@ -8,7 +8,8 @@ public class Main {
         testOBject.setName("abc");
 
         JStream jStream = new JStream();
-        System.out.println(jStream.toJson(testOBject));
+        TestOBject result = jStream.fromJson("{\"user_name\":\"cdf\"}",TestOBject.class);
+        System.out.println(result);
 
     }
 

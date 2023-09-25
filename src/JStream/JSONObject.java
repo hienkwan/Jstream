@@ -2,6 +2,8 @@ package JStream;
 
 import Reflection.JsonProperty;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,10 +27,12 @@ public class JSONObject {
             String key = kvPair.substring(firstIndexOfDoubleQuote + 1, secondIndexOfDoubleQuote);
             int indexOfDoubleQuoteOfValue = kvPair.indexOf("\"", secondIndexOfDoubleQuote + 1);
             String value = null;
-            if (indexOfDoubleQuoteOfValue != -1) {
+            if (indexOfDoubleQuoteOfValue != -1) { //value of string type
                 int firstIndexOfDoubleQuoteForValue = indexOfDoubleQuoteOfValue;
                 int secondIndexOfDoubleQuoteForValue = kvPair.indexOf("\"", firstIndexOfDoubleQuoteForValue + 1);
                 value = kvPair.substring(firstIndexOfDoubleQuoteForValue + 1, secondIndexOfDoubleQuoteForValue);
+            } else {
+                //handle value of object type
             }
             data.put(key, value);
         }
@@ -64,13 +68,53 @@ public class JSONObject {
     }
 
 
-    public Object fromJson(Class<?> clazz) {
+    public <T> T fromJson(Class<T> clazz) {
+        try {
+            Constructor<T> ctor = clazz.getDeclaredConstructor();
+            ctor.setAccessible(true);
+            T instance = ctor.newInstance();
+            return parseJson(instance);
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
+            System.out.println(e);
+        }
 
+        return null;
+    }
 
-        for (Map.Entry<String, Object> entry : data.entrySet()) {
+    private <T> T parseJson(T instance) {
+        for (var field : instance.getClass().getDeclaredFields()) {
+            var annotation = field.getAnnotation(JsonProperty.class);
+
+            var name = "";
+            Object value = null;
+            if (annotation != null) {
+                name = annotation.name();
+                if (data.containsKey(name)) {
+                    value = data.get(name);
+                }
+            }
+
+            if(name.isBlank() || value == null){
+                name = field.getName();
+                if(data.containsKey(name)){
+                    value = data.get(name);
+                }
+            }
+
+            if(name.isBlank() || value == null){
+                throw new RuntimeException("Value for field "+field.getName()+" not found");
+            }
+
+            field.setAccessible(true);
+            try {
+                field.set(instance,value);
+            }catch (IllegalAccessException e){
+                throw new RuntimeException(e);
+            }
 
         }
-        return null;
+        return instance;
     }
 
     public String toJsonString() {

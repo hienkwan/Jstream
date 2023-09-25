@@ -12,4 +12,11 @@ public class TestOBject {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "TestOBject{" +
+                "name='" + name + '\'' +
+                '}';
+    }
 }
