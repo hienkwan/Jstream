@@ -3,6 +3,7 @@ package JStream;
 import Reflection.JsonProperty;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
@@ -32,12 +33,15 @@ public class JSONObject {
                 int secondIndexOfDoubleQuoteForValue = kvPair.indexOf("\"", firstIndexOfDoubleQuoteForValue + 1);
                 value = kvPair.substring(firstIndexOfDoubleQuoteForValue + 1, secondIndexOfDoubleQuoteForValue);
             } else {
-                //handle value of object type
+                //TODO: handle value of object type
+                int lastColonIndex = kvPair.lastIndexOf(":");
+                value = kvPair.substring(lastColonIndex+1);
             }
             data.put(key, value);
         }
     }
 
+    //parse from object to JsonObject
     public JSONObject toJSONObject(Object instance) throws IllegalAccessException {
         Class<?> clazz = instance.getClass();
         for (var field : clazz.getDeclaredFields()) {
@@ -48,6 +52,11 @@ public class JSONObject {
             String name = "";
             if (annotation != null) {
                 name = annotation.name();
+                put(name, value);
+            }
+
+            if(annotation == null){
+                name = field.getName();
                 put(name, value);
             }
 
@@ -68,6 +77,7 @@ public class JSONObject {
     }
 
 
+    //parse from json to object
     public <T> T fromJson(Class<T> clazz) {
         try {
             Constructor<T> ctor = clazz.getDeclaredConstructor();
@@ -82,6 +92,7 @@ public class JSONObject {
         return null;
     }
 
+    //helper method to parse from json to object
     private <T> T parseJson(T instance) {
         for (var field : instance.getClass().getDeclaredFields()) {
             var annotation = field.getAnnotation(JsonProperty.class);
@@ -107,23 +118,61 @@ public class JSONObject {
             }
 
             field.setAccessible(true);
-            try {
-                field.set(instance,value);
-            }catch (IllegalAccessException e){
-                throw new RuntimeException(e);
-            }
+            System.out.println(field.getType());
+            setFieldValue(instance,field,value);
 
         }
         return instance;
     }
 
+    private <T> void setFieldValue(Object object, Field field, Object value) {
+        Class<?> fieldType = field.getType();
+
+        T parsedValue = null;
+        if (fieldType == int.class || fieldType == Integer.class ) {
+            parsedValue = (T) Integer.valueOf(value.toString());
+        } else if (fieldType == double.class || fieldType == Double.class) {
+            parsedValue = (T) Double.valueOf(value.toString());
+        } else if (fieldType == boolean.class || fieldType == Boolean.class) {
+            parsedValue = (T) Boolean.valueOf(value.toString());
+        }else if(fieldType == String.class){
+            parsedValue = (T) value.toString();
+        }else {
+            try{
+                Object customObject = fieldType.getDeclaredConstructor().newInstance();
+                if (value instanceof Map) {
+                    Map<String, Object> customObjectMap = (Map<String, Object>) value;
+                    for (Field customField : fieldType.getDeclaredFields()) {
+                        String fieldName = customField.getName();
+                        if (customObjectMap.containsKey(fieldName)) {
+                            Object fieldValue = customObjectMap.get(fieldName);
+                            setFieldValue(customObject, customField, fieldValue);
+                        }
+                    }
+                }
+                parsedValue = (T) customObject;
+            }catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+
+        // Cast the parsed value to the field's type and set it
+        field.setAccessible(true); // Enable access to private fields
+        try {
+            field.set(object, parsedValue);
+        }catch (IllegalAccessException e){
+            throw new RuntimeException(e);
+        }
+    }
     public String toJsonString() {
-        StringBuilder json = new StringBuilder("{");
-        boolean first = true;
+        StringBuilder json = new StringBuilder();
 
         for (Map.Entry<String, Object> entry : data.entrySet()) {
-            if (!first) {
+            if (json.length() > 0) {
                 json.append(",");
+            }else {
+                json.append("{");
             }
             json.append("\"").append(entry.getKey()).append("\":");
 
@@ -133,7 +182,6 @@ public class JSONObject {
                 json.append(entry.getValue());
             }
 
-            first = false;
         }
 
         json.append("}");
