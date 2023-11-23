@@ -16,6 +16,10 @@ public class JSONObject {
         data = new HashMap<>();
     }
 
+    public JSONObject(Map<String, Object> data) {
+        this.data = data;
+    }
+
     public JSONObject(String jsonString) {
         jsonString = jsonString.replace("{", "");
         jsonString = jsonString.replace("}", "");
@@ -26,19 +30,24 @@ public class JSONObject {
             int firstIndexOfDoubleQuote = kvPair.indexOf("\"");
             int secondIndexOfDoubleQuote = kvPair.indexOf("\"", firstIndexOfDoubleQuote + 1);
             String key = kvPair.substring(firstIndexOfDoubleQuote + 1, secondIndexOfDoubleQuote);
-            int indexOfDoubleQuoteOfValue = kvPair.indexOf("\"", secondIndexOfDoubleQuote + 1);
-            String value = null;
-            if (indexOfDoubleQuoteOfValue != -1) { //value of string type
-                int firstIndexOfDoubleQuoteForValue = indexOfDoubleQuoteOfValue;
-                int secondIndexOfDoubleQuoteForValue = kvPair.indexOf("\"", firstIndexOfDoubleQuoteForValue + 1);
-                value = kvPair.substring(firstIndexOfDoubleQuoteForValue + 1, secondIndexOfDoubleQuoteForValue);
-            } else {
-                //TODO: handle value of object type
-                int lastColonIndex = kvPair.lastIndexOf(":");
-                value = kvPair.substring(lastColonIndex+1);
-            }
+            String value = getValue(kvPair, secondIndexOfDoubleQuote);
             data.put(key, value);
         }
+    }
+
+    private static String getValue(String kvPair, int secondIndexOfDoubleQuote) {
+        int indexOfDoubleQuoteOfValue = kvPair.indexOf("\"", secondIndexOfDoubleQuote + 1);
+        String value = null;
+        if (indexOfDoubleQuoteOfValue != -1) { //value of string type
+            int firstIndexOfDoubleQuoteForValue = indexOfDoubleQuoteOfValue;
+            int secondIndexOfDoubleQuoteForValue = kvPair.indexOf("\"", firstIndexOfDoubleQuoteForValue + 1);
+            value = kvPair.substring(firstIndexOfDoubleQuoteForValue + 1, secondIndexOfDoubleQuoteForValue);
+        } else {
+            //TODO: handle value of object type
+            int lastColonIndex = kvPair.lastIndexOf(":");
+            value = kvPair.substring(lastColonIndex + 1);
+        }
+        return value;
     }
 
     //parse from object to JsonObject
@@ -55,7 +64,7 @@ public class JSONObject {
                 put(name, value);
             }
 
-            if(annotation == null){
+            if (annotation == null) {
                 name = field.getName();
                 put(name, value);
             }
@@ -106,20 +115,20 @@ public class JSONObject {
                 }
             }
 
-            if(name.isBlank() || value == null){
+            if (name.isBlank() || value == null) {
                 name = field.getName();
-                if(data.containsKey(name)){
+                if (data.containsKey(name)) {
                     value = data.get(name);
                 }
             }
 
-            if(name.isBlank() || value == null){
-                throw new RuntimeException("Value for field "+field.getName()+" not found");
+            if (name.isBlank() || value == null) {
+                throw new RuntimeException("Value for field " + field.getName() + " not found");
             }
 
             field.setAccessible(true);
             System.out.println(field.getType());
-            setFieldValue(instance,field,value);
+            setFieldValue(instance, field, value);
 
         }
         return instance;
@@ -129,16 +138,16 @@ public class JSONObject {
         Class<?> fieldType = field.getType();
 
         T parsedValue = null;
-        if (fieldType == int.class || fieldType == Integer.class ) {
+        if (fieldType == int.class || fieldType == Integer.class) {
             parsedValue = (T) Integer.valueOf(value.toString());
         } else if (fieldType == double.class || fieldType == Double.class) {
             parsedValue = (T) Double.valueOf(value.toString());
         } else if (fieldType == boolean.class || fieldType == Boolean.class) {
             parsedValue = (T) Boolean.valueOf(value.toString());
-        }else if(fieldType == String.class){
+        } else if (fieldType == String.class) {
             parsedValue = (T) value.toString();
-        }else {
-            try{
+        } else {
+            try {
                 Object customObject = fieldType.getDeclaredConstructor().newInstance();
                 if (value instanceof Map) {
                     Map<String, Object> customObjectMap = (Map<String, Object>) value;
@@ -151,7 +160,7 @@ public class JSONObject {
                     }
                 }
                 parsedValue = (T) customObject;
-            }catch (Exception e) {
+            } catch (Exception e) {
                 throw new RuntimeException(e);
             }
 
@@ -161,17 +170,18 @@ public class JSONObject {
         field.setAccessible(true); // Enable access to private fields
         try {
             field.set(object, parsedValue);
-        }catch (IllegalAccessException e){
+        } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }
+
     public String toJsonString() {
         StringBuilder json = new StringBuilder();
 
         for (Map.Entry<String, Object> entry : data.entrySet()) {
             if (json.length() > 0) {
                 json.append(",");
-            }else {
+            } else {
                 json.append("{");
             }
             json.append("\"").append(entry.getKey()).append("\":");
