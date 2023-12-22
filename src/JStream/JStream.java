@@ -1,7 +1,7 @@
 package JStream;
 
 
-import Reflection.JsonProperty;
+import Reflection.JsonAttribute;
 
 public class JStream {
 
@@ -25,7 +25,7 @@ public class JStream {
 
     private static <T> T parseJson(JSONObject json,T instance){
         for(var field : instance.getClass().getDeclaredFields()){
-            var annotation = field.getAnnotation(JsonProperty.class);
+            var annotation = field.getAnnotation(JsonAttribute.class);
 
             var name = "";
             Object value = null;

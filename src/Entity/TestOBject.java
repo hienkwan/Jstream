@@ -1,9 +1,14 @@
 package Entity;
-import Reflection.JsonProperty;
+import Reflection.JsonAttribute;
 
 public class TestOBject {
-    @JsonProperty(name = "user_name")
+    @JsonAttribute(name = "user_name")
     private String name;
+
+    private Integer age;
+
+    private NestedObj nestedObj;
+
 
     public String getName() {
         return name;
@@ -13,10 +18,27 @@ public class TestOBject {
         this.name = name;
     }
 
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+
+    public NestedObj getNestedObj() {
+        return nestedObj;
+    }
+
+    public void setNestedObj(NestedObj nestedObj) {
+        this.nestedObj = nestedObj;
+    }
+
     @Override
     public String toString() {
         return "TestOBject{" +
                 "name='" + name + '\'' +
+                ", age=" + age +
                 '}';
     }
 }

@@ -4,4 +4,11 @@
 *.class
 *.iml
 *.xml
-/out/
+target/
+bin/
+out/
+build/
+*.iws
+*.ipr
+.idea/
+.idea_modules/
