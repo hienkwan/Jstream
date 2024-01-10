@@ -18,7 +18,9 @@ public class JStream {
     }
 
     public  String toJson(Object instance) throws IllegalAccessException {
-        jsonObject.toJSONObject(instance);
+        jsonObject = new JSONObjectBuilder()
+                .withInstance(instance)
+                .build();
 
         return jsonObject.toJsonString();
     }

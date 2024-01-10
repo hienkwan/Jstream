@@ -8,24 +8,10 @@ public class JSONObject {
     private JsonParser jsonParser;
     private ObjectToJsonConverter objectToJsonConverter;
 
-    public JSONObject() {
-        jsonData = new JsonData();
-        jsonParser = new JsonParserImpl(jsonData);
-        objectToJsonConverter = new ObjectToJsonConverterImpl(jsonData);
-    }
-
-    public JSONObject(Map<String, Object> data) {
-        jsonData = new JsonData();
-        jsonData.setData(data);
-        jsonParser = new JsonParserImpl(jsonData);
-        objectToJsonConverter = new ObjectToJsonConverterImpl(jsonData);
-    }
-
-    public JSONObject(String jsonString) {
-        jsonData = new JsonData();
-        jsonParser = new JsonParserImpl(jsonData);
-        jsonData.setData(jsonParser.parse(jsonString));
-        objectToJsonConverter = new ObjectToJsonConverterImpl(jsonData);
+    public JSONObject(JsonData jsonData,JsonParser jsonParser,ObjectToJsonConverter objectToJsonConverter) {
+        this.jsonData = jsonData;
+        this.jsonParser = jsonParser;
+        this.objectToJsonConverter = objectToJsonConverter;
     }
 
     //parse from object to JsonObject

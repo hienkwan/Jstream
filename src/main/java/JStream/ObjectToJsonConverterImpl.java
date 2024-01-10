@@ -32,7 +32,9 @@ public class ObjectToJsonConverterImpl implements ObjectToJsonConverter{
                 jsonData.put(name, value);
             }
         }
-        return new JSONObject(jsonData.getData());
+        return new JSONObjectBuilder()
+                .withData(jsonData.getData())
+                .build();
     }
 
     private Map<String, Object> recursiveTrace(Object instance) throws IllegalAccessException {

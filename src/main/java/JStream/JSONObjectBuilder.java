@@ -4,18 +4,39 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JSONObjectBuilder {
-    private Map<String, Object> data;
+    private JsonData jsonData;
+    private JsonParser jsonParser;
+    private ObjectToJsonConverter objectToJsonConverter;
 
     public JSONObjectBuilder() {
-        data = new HashMap<>();
+        jsonData = new JsonData();
     }
 
-    public JSONObjectBuilder add(String key, Object value) {
-        data.put(key, value);
+    public JSONObjectBuilder withData(Map<String, Object> data) {
+        jsonData.setData(data);
+        return this;
+    }
+
+    public JSONObjectBuilder withInstance(Object instance) throws IllegalAccessException {
+        objectToJsonConverter = new ObjectToJsonConverterImpl(jsonData);
+        objectToJsonConverter.convert(instance);
+        return this;
+    }
+
+    public JSONObjectBuilder withJsonString(String jsonString) {
+        jsonParser = new JsonParserImpl(jsonData);
+        jsonData.setData(jsonParser.parse(jsonString));
         return this;
     }
 
     public JSONObject build() {
-        return new JSONObject(data);
+        if(jsonParser == null){
+            jsonParser = new JsonParserImpl(jsonData);
+        }
+
+        if(objectToJsonConverter == null){
+            objectToJsonConverter = new ObjectToJsonConverterImpl(jsonData);
+        }
+        return new JSONObject(jsonData,jsonParser,objectToJsonConverter);
     }
 }
