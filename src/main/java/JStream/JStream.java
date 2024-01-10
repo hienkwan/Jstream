@@ -8,7 +8,7 @@ public class JStream {
     private JSONObject jsonObject;
 
     public JStream() {
-        jsonObject = new JSONObject();
+        jsonObject = new JSONObjectBuilder().build();
     }
 
     public <T> T fromJson(String jsonString,Class<?> clazz){
