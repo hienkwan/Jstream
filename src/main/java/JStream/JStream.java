@@ -8,7 +8,7 @@ public class JStream {
     private JSONObject jsonObject;
 
     public JStream() {
-        jsonObject = new JSONObject();
+        jsonObject = new JSONObjectBuilder().build();
     }
 
     public <T> T fromJson(String jsonString,Class<?> clazz){
@@ -18,7 +18,9 @@ public class JStream {
     }
 
     public  String toJson(Object instance) throws IllegalAccessException {
-        jsonObject.toJSONObject(instance);
+        jsonObject = new JSONObjectBuilder()
+                .withInstance(instance)
+                .build();
 
         return jsonObject.toJsonString();
     }
