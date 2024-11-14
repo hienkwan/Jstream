@@ -35,7 +35,7 @@ public class JsonData {
 
         for (Map.Entry<String, Object> entry : data.entrySet()) {
             if (json.length() > 0) {
-                json.append(",\n");
+                json.append(",");
             } else {
                 json.append("{");
             }
