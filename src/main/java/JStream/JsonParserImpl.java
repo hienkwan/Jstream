@@ -18,37 +18,34 @@ public class JsonParserImpl implements JsonParser{
     }
 
     @Override
-    public Map<String, Object> parse(String jsonString) {
+    public Map<String, Object> parse(String jsonString) throws Exception {
         Map<String, Object> data;
-        jsonString = jsonString.replace("{", "");
-        jsonString = jsonString.replace("}", "");
 
-        List<String> pairFields = List.of(jsonString.split(","));
-        data = new HashMap<>();
-        for (String kvPair : pairFields) {
-            int firstIndexOfDoubleQuote = kvPair.indexOf("\"");
-            int secondIndexOfDoubleQuote = kvPair.indexOf("\"", firstIndexOfDoubleQuote + 1);
-            String key = kvPair.substring(firstIndexOfDoubleQuote + 1, secondIndexOfDoubleQuote);
-            String value = getValue(kvPair, secondIndexOfDoubleQuote);
-            data.put(key, value);
+        try{
+            data = ParserProcessor.parse(jsonString);
+        }catch (Exception ex){
+            throw ex;
         }
+
         return data;
     }
 
-    private static String getValue(String kvPair, int secondIndexOfDoubleQuote) {
-        int indexOfDoubleQuoteOfValue = kvPair.indexOf("\"", secondIndexOfDoubleQuote + 1);
-        String value = null;
-        if (indexOfDoubleQuoteOfValue != -1) { //value of string type
-            int firstIndexOfDoubleQuoteForValue = indexOfDoubleQuoteOfValue;
-            int secondIndexOfDoubleQuoteForValue = kvPair.indexOf("\"", firstIndexOfDoubleQuoteForValue + 1);
-            value = kvPair.substring(firstIndexOfDoubleQuoteForValue + 1, secondIndexOfDoubleQuoteForValue);
-        } else {
-            //TODO: handle value of object type
-            int lastColonIndex = kvPair.lastIndexOf(":");
-            value = kvPair.substring(lastColonIndex + 1);
-        }
-        return value;
-    }
+
+
+//    private static String getValue(String kvPair, int secondIndexOfDoubleQuote) {
+//        int indexOfDoubleQuoteOfValue = kvPair.indexOf("\"", secondIndexOfDoubleQuote + 1);
+//        String value = null;
+//        if (indexOfDoubleQuoteOfValue != -1) { //value of string type
+//            int firstIndexOfDoubleQuoteForValue = indexOfDoubleQuoteOfValue;
+//            int secondIndexOfDoubleQuoteForValue = kvPair.indexOf("\"", firstIndexOfDoubleQuoteForValue + 1);
+//            value = kvPair.substring(firstIndexOfDoubleQuoteForValue + 1, secondIndexOfDoubleQuoteForValue);
+//        } else {
+//            //TODO: handle value of object type
+//            int lastColonIndex = kvPair.lastIndexOf(":");
+//            value = kvPair.substring(lastColonIndex + 1);
+//        }
+//        return value;
+//    }
 
     public <T> T fromJson(Class<T> clazz) {
         try {
@@ -64,6 +61,7 @@ public class JsonParserImpl implements JsonParser{
         return null;
     }
 
+    //TODO adjust to parse data from Map to actual object
     //helper method to parse from json to object
     private <T> T parseJson(T instance) {
         for (var field : instance.getClass().getDeclaredFields()) {
@@ -109,7 +107,10 @@ public class JsonParserImpl implements JsonParser{
             parsedValue = (T) Boolean.valueOf(value.toString());
         } else if (fieldType == String.class) {
             parsedValue = (T) value.toString();
-        } else {
+        } else if (fieldType == List.class){
+            parsedValue = (T) value;
+        }
+        else {
             try {
                 Object customObject = fieldType.getDeclaredConstructor().newInstance();
                 if (value instanceof Map) {
@@ -137,5 +138,4 @@ public class JsonParserImpl implements JsonParser{
             throw new RuntimeException(e);
         }
     }
-
 }

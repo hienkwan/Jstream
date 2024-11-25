@@ -11,8 +11,11 @@ public class JStream {
         jsonObject = new JSONObjectBuilder().build();
     }
 
-    public <T> T fromJson(String jsonString,Class<?> clazz){
-        jsonObject = new JSONObject(jsonString);
+    public <T> T fromJson(String jsonString,Class<?> clazz) throws Exception {
+        //jsonObject = new JSONObject(jsonString);
+        jsonObject = new JSONObjectBuilder()
+                .withJsonString(jsonString)
+                .build();
 
         return (T) jsonObject.fromJson(clazz);
     }
