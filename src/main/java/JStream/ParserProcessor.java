@@ -5,6 +5,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
+import Exception.InvalidJsonStringException;
+
 public class ParserProcessor {
     private static final Logger logger = LogManager.getLogger(ParserProcessor.class);
 
@@ -71,7 +73,7 @@ public class ParserProcessor {
         } else if (json.startsWith("null", index)) {
             return null;
         } else {
-            throw new Exception("Unexpected value at position: " + index);
+            throw new InvalidJsonStringException("Unexpected value at position: " + index);
         }
     }
 
