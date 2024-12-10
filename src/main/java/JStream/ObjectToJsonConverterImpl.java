@@ -5,9 +5,10 @@ import Reflection.JsonAttribute;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ObjectToJsonConverterImpl implements ObjectToJsonConverter{
+public class ObjectToJsonConverterImpl implements ObjectToJsonConverter {
 
     private JsonData jsonData;
+
     public ObjectToJsonConverterImpl(JsonData jsonData) {
         this.jsonData = jsonData;
     }
@@ -38,6 +39,10 @@ public class ObjectToJsonConverterImpl implements ObjectToJsonConverter{
     }
 
     private Map<String, Object> recursiveTrace(Object instance) throws IllegalAccessException {
+        if (instance == null) {
+            return null;
+        }
+
         Map<String, Object> valueReturned = new HashMap<>();
         Class<?> clazz = instance.getClass();
 
