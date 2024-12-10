@@ -19,6 +19,7 @@ public class ParserProcessor {
 
     public static Map<String, Object> parseObject(String jsonStr) throws Exception {
         Map<String, Object> map = new HashMap<>();
+        boolean isEndOfNestedObject = false;
 
         if (jsonStr.charAt(index) == '{') {
             logger.info("'{' found,  beginning of the object");
@@ -26,8 +27,17 @@ public class ParserProcessor {
         }
         skipWhiteSpace(jsonStr);
 
-        while (jsonStr.charAt(index) != '}') {
+        while (jsonStr.charAt(index) != '}' || index != jsonStr.length()-1) {
             String key = "";
+            while(jsonStr.charAt(index) == '}' || jsonStr.charAt(index) == ','){
+                index++;
+                isEndOfNestedObject = true;
+            }
+
+            if(isEndOfNestedObject){
+                return map;
+            }
+
             if (jsonStr.charAt(index) == '"') {
                 key = parseKey(jsonStr);
             }
@@ -143,13 +153,14 @@ public class ParserProcessor {
     }
 
     public static void main(String[] args) throws Exception {
-        var test =
-                parse("{\n" +
-                        "  \"name\": \"John Doe\",\n" +
-                        "  \"age\": \"test\"\n" +
-                        "  \"test\": -100.5\n" +
-                        "  \"array\": [300,200,\"string\"]\n" +
-                        "}");
+//        var test =
+//                parse("{\n" +
+//                        "  \"name\": \"John Doe\",\n" +
+//                        "  \"age\": \"test\"\n" +
+//                        "  \"test\": -100.5\n" +
+//                        "  \"array\": [300,200,\"string\"]\n" +
+//                        "}");
+        var test =  parse("{\"address\":{\"city\":\"Mock City\",\"street\":\"123 Mock St\"},\"name\":\"Johnny\"}");
 
         System.out.println(test);
     }
