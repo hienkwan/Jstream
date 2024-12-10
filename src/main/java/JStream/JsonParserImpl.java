@@ -5,11 +5,10 @@ import Reflection.JsonAttribute;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class JsonParserImpl implements JsonParser{
+public class JsonParserImpl implements JsonParser {
 
     private JsonData jsonData;
 
@@ -21,31 +20,14 @@ public class JsonParserImpl implements JsonParser{
     public Map<String, Object> parse(String jsonString) throws Exception {
         Map<String, Object> data;
 
-        try{
+        try {
             data = ParserProcessor.parse(jsonString);
-        }catch (Exception ex){
+        } catch (Exception ex) {
             throw ex;
         }
 
         return data;
     }
-
-
-
-//    private static String getValue(String kvPair, int secondIndexOfDoubleQuote) {
-//        int indexOfDoubleQuoteOfValue = kvPair.indexOf("\"", secondIndexOfDoubleQuote + 1);
-//        String value = null;
-//        if (indexOfDoubleQuoteOfValue != -1) { //value of string type
-//            int firstIndexOfDoubleQuoteForValue = indexOfDoubleQuoteOfValue;
-//            int secondIndexOfDoubleQuoteForValue = kvPair.indexOf("\"", firstIndexOfDoubleQuoteForValue + 1);
-//            value = kvPair.substring(firstIndexOfDoubleQuoteForValue + 1, secondIndexOfDoubleQuoteForValue);
-//        } else {
-//            //TODO: handle value of object type
-//            int lastColonIndex = kvPair.lastIndexOf(":");
-//            value = kvPair.substring(lastColonIndex + 1);
-//        }
-//        return value;
-//    }
 
     public <T> T fromJson(Class<T> clazz) {
         try {
@@ -107,10 +89,9 @@ public class JsonParserImpl implements JsonParser{
             parsedValue = (T) Boolean.valueOf(value.toString());
         } else if (fieldType == String.class) {
             parsedValue = (T) value.toString();
-        } else if (fieldType == List.class){
+        } else if (fieldType == List.class) {
             parsedValue = (T) value;
-        }
-        else {
+        } else {
             try {
                 Object customObject = fieldType.getDeclaredConstructor().newInstance();
                 if (value instanceof Map) {
