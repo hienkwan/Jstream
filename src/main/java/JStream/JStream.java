@@ -1,10 +1,11 @@
 package JStream;
 
-
 import Reflection.JsonAttribute;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class JStream {
-
+    private static final Logger logger = LogManager.getLogger(JStream.class);
     private JSONObject jsonObject;
 
     public JStream() {

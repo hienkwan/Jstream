@@ -1,6 +1,8 @@
 package JStream;
 
 import Reflection.JsonAttribute;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -9,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public class JsonParserImpl implements JsonParser {
+    private static final Logger logger = LogManager.getLogger(JsonParserImpl.class);
     private JsonData jsonData;
 
     public JsonParserImpl(JsonData jsonData) {
@@ -36,7 +39,7 @@ public class JsonParserImpl implements JsonParser {
             return parseJson(instance);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                  NoSuchMethodException e) {
-            System.out.println(e);
+            logger.error(String.valueOf(e));
         }
 
         return null;
@@ -65,11 +68,12 @@ public class JsonParserImpl implements JsonParser {
             }
 
             if (name.isBlank() || value == null) {
+                logger.warn("Value for field {} not found", field.getName());
                 throw new RuntimeException("Value for field " + field.getName() + " not found");
             }
 
             field.setAccessible(true);
-            System.out.println(field.getType());
+            logger.info("FieldType: {}",field.getType());
             setFieldValue(instance, field, value);
         }
         return instance;
@@ -106,8 +110,8 @@ public class JsonParserImpl implements JsonParser {
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
-
         }
+        logger.info("Parse Object: {}, field: {}, parsedValue: {}", object, field, value);
 
         // Enable access to private fields
         field.setAccessible(true);
