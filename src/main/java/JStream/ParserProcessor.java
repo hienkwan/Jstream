@@ -52,6 +52,10 @@ public class ParserProcessor {
             map.put(key, value);
             skipWhiteSpace(jsonStr);
 
+            if(index == jsonStr.length()){
+                break;
+            }
+
             if (jsonStr.charAt(index) == ',') {
                 index++;
                 skipWhiteSpace(jsonStr);
@@ -121,7 +125,11 @@ public class ParserProcessor {
         }
         index++;
 
-        return isFloatingPoint ? Float.parseFloat(sb.toString().trim()) : Integer.parseInt(sb.toString().trim());
+        if (isFloatingPoint) {
+            return Float.parseFloat(sb.toString().trim());
+        } else {
+            return Integer.parseInt(sb.toString().trim());
+        }
     }
 
     private static List<Object> parseArray(String json) throws Exception {
@@ -160,7 +168,7 @@ public class ParserProcessor {
 //                        "  \"test\": -100.5\n" +
 //                        "  \"array\": [300,200,\"string\"]\n" +
 //                        "}");
-        var test =  parse("{\"address\":{\"city\":\"Mock City\",\"street\":\"123 Mock St\"},\"name\":\"Johnny\"}");
+        var test =  parse("{\"user_name\":\"abc\",\"nestedObj\":{\"property2\":\"sde\",\"property1\":\"cfe\"},\"age\":10}");
 
         System.out.println(test);
     }

@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 public class JsonParserImpl implements JsonParser {
-
     private JsonData jsonData;
 
     public JsonParserImpl(JsonData jsonData) {
@@ -72,7 +71,6 @@ public class JsonParserImpl implements JsonParser {
             field.setAccessible(true);
             System.out.println(field.getType());
             setFieldValue(instance, field, value);
-
         }
         return instance;
     }
@@ -111,8 +109,10 @@ public class JsonParserImpl implements JsonParser {
 
         }
 
+        // Enable access to private fields
+        field.setAccessible(true);
+
         // Cast the parsed value to the field's type and set it
-        field.setAccessible(true); // Enable access to private fields
         try {
             field.set(object, parsedValue);
         } catch (IllegalAccessException e) {

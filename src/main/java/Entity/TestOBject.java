@@ -9,6 +9,8 @@ public class TestOBject {
 
     private NestedObj nestedObj;
 
+    public TestOBject() {
+    }
 
     public String getName() {
         return name;
@@ -39,6 +41,7 @@ public class TestOBject {
         return "TestOBject{" +
                 "name='" + name + '\'' +
                 ", age=" + age +
+                ", nestedObj=" + nestedObj +
                 '}';
     }
 }
