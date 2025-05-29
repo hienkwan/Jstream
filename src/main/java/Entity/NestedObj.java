@@ -4,6 +4,9 @@ public class NestedObj {
     private String property1;
     private String property2;
 
+    public NestedObj() {
+    }
+
     public NestedObj(String property1, String property2) {
         this.property1 = property1;
         this.property2 = property2;
@@ -23,5 +26,13 @@ public class NestedObj {
 
     public void setProperty2(String property2) {
         this.property2 = property2;
+    }
+
+    @Override
+    public String toString() {
+        return "NestedObj{" +
+                "property1='" + property1 + '\'' +
+                ", property2='" + property2 + '\'' +
+                '}';
     }
 }

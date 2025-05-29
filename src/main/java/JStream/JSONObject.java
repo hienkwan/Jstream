@@ -48,6 +48,4 @@ public class JSONObject {
         }
         return result.toString();
     }
-
-
 }
