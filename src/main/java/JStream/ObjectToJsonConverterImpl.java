@@ -1,6 +1,7 @@
 package JStream;
 
 import Reflection.JsonAttribute;
+import Exception.JsonSerializationException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,51 +15,69 @@ public class ObjectToJsonConverterImpl implements ObjectToJsonConverter {
     }
 
     @Override
-    public JSONObject convert(Object instance) throws IllegalAccessException {
+    public JSONObject convert(Object instance){
         return toJSONObject(instance);
     }
 
-    public JSONObject toJSONObject(Object instance) throws IllegalAccessException {
-        Class<?> clazz = instance.getClass();
-        for (var field : clazz.getDeclaredFields()) {
-            var annotation = field.getAnnotation(JsonAttribute.class);
-            field.setAccessible(true);
-            Object value = field.get(instance);
-
-            String name = (annotation != null) ? annotation.name() : field.getName();
-
-            if (!isWrapperType(field.getType())) {
-                jsonData.put(name, recursiveTrace(value));
-            } else {
-                jsonData.put(name, value);
-            }
+    public JSONObject toJSONObject(Object instance){
+        if (instance instanceof Map obj) {
+            jsonData.setData(obj);
+        } else {
+            processObjectFields(instance);
         }
+
         return new JSONObjectBuilder()
                 .withData(jsonData.getData())
                 .build();
+    }
+
+    private void processObjectFields(Object instance) {
+        try {
+            Class<?> clazz = instance.getClass();
+            for (var field : clazz.getDeclaredFields()) {
+                var annotation = field.getAnnotation(JsonAttribute.class);
+                field.setAccessible(true);
+                Object value = field.get(instance);
+
+                String name = (annotation != null) ? annotation.name() : field.getName();
+
+                if (!isWrapperType(field.getType())) {
+                    jsonData.put(name, recursiveTrace(value));
+                } else {
+                    jsonData.put(name, value);
+                }
+            }
+        } catch (IllegalAccessException e) {
+            throw new JsonSerializationException("Cannot serialize object", e);
+        }
     }
 
     private Map<String, Object> recursiveTrace(Object instance) throws IllegalAccessException {
         if (instance == null) {
             return null;
         }
-
         Map<String, Object> valueReturned = new HashMap<>();
-        Class<?> clazz = instance.getClass();
 
-        for (var field : clazz.getDeclaredFields()) {
-            var annotation = field.getAnnotation(JsonAttribute.class);
-            field.setAccessible(true);
-            Object value = field.get(instance);
+        try {
+            Class<?> clazz = instance.getClass();
 
-            String name = (annotation != null) ? annotation.name() : field.getName();
+            for (var field : clazz.getDeclaredFields()) {
+                var annotation = field.getAnnotation(JsonAttribute.class);
+                field.setAccessible(true);
+                Object value = field.get(instance);
 
-            if (!isWrapperType(field.getType())) {
-                valueReturned.put(name, recursiveTrace(value));
-            } else {
-                valueReturned.put(name, value);
+                String name = (annotation != null) ? annotation.name() : field.getName();
+
+                if (!isWrapperType(field.getType())) {
+                    valueReturned.put(name, recursiveTrace(value));
+                } else {
+                    valueReturned.put(name, value);
+                }
             }
+        } catch (IllegalAccessException e) {
+            throw new IllegalAccessException();
         }
+
         return valueReturned;
     }
 

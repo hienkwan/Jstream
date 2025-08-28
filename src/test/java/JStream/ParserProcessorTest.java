@@ -1,6 +1,8 @@
 package JStream;
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
@@ -87,5 +89,20 @@ class ParserProcessorTest {
         Person expectedPerson = new Person("Johnny",address);
         assertEquals(expectedPerson,parsedPerson);
 
+    }
+
+    @Test
+    void testWithMapInstance() {
+        JStream jsonSerializer = new JStream();
+
+        Map<String, Object> map = new MapBuilder()
+                .with("apple", 5)
+                .with("banana", 3)
+                .with("orange", 8)
+                .build();
+
+        String jsonString = jsonSerializer.toJson(map);
+
+        assertEquals("{\"banana\":3,\"orange\":8,\"apple\":5}", jsonString);
     }
 }

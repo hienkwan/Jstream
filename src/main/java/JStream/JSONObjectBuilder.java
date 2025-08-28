@@ -1,6 +1,5 @@
 package JStream;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class JSONObjectBuilder {
@@ -17,7 +16,7 @@ public class JSONObjectBuilder {
         return this;
     }
 
-    public JSONObjectBuilder withInstance(Object instance) throws IllegalAccessException {
+    public JSONObjectBuilder withInstance(Object instance) {
         objectToJsonConverter = new ObjectToJsonConverterImpl(jsonData);
         objectToJsonConverter.convert(instance);
         return this;
