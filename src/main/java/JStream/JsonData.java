@@ -34,7 +34,7 @@ public class JsonData {
         StringBuilder json = new StringBuilder();
 
         for (Map.Entry<String, Object> entry : data.entrySet()) {
-            if (json.length() > 0) {
+            if (!json.isEmpty()) {
                 json.append(",");
             } else {
                 json.append("{");
@@ -50,6 +50,11 @@ public class JsonData {
                 json.append(entry.getValue());
             }
 
+        }
+
+        //In case no field in the object
+        if (data.isEmpty()) {
+            json.append("{");
         }
 
         json.append("}");

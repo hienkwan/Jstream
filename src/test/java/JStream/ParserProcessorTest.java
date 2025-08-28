@@ -105,4 +105,16 @@ class ParserProcessorTest {
 
         assertEquals("{\"banana\":3,\"orange\":8,\"apple\":5}", jsonString);
     }
+
+    @Test
+    void testWithEmptyMapInstance() {
+        JStream jsonSerializer = new JStream();
+
+        Map<String, Object> map = new MapBuilder()
+                .build();
+
+        String jsonString = jsonSerializer.toJson(map);
+
+        assertEquals("{}", jsonString);
+    }
 }
