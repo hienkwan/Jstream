@@ -12,12 +12,12 @@ public class ParserProcessor {
 
     public static Integer index;
 
-    public static Map<String, Object> parse(String jsonStr) throws Exception {
+    public static Map<String, Object> parse(String jsonStr) throws InvalidJsonStringException {
         index = 0;
         return parseObject(jsonStr);
     }
 
-    public static Map<String, Object> parseObject(String jsonStr) throws Exception {
+    public static Map<String, Object> parseObject(String jsonStr) throws InvalidJsonStringException {
         Map<String, Object> map = new HashMap<>();
         boolean isEndOfNestedObject = false;
 
@@ -69,7 +69,7 @@ public class ParserProcessor {
         return parseString(json);
     }
 
-    public static Object parseValue(String json) throws Exception {
+    public static Object parseValue(String json) throws InvalidJsonStringException {
         char currentChar = json.charAt(index);
 
         if (currentChar == '{') {
@@ -132,7 +132,7 @@ public class ParserProcessor {
         }
     }
 
-    private static List<Object> parseArray(String json) throws Exception {
+    private static List<Object> parseArray(String json) throws InvalidJsonStringException {
         List<Object> list = new ArrayList<>();
         index++; // skipping '['
 
@@ -159,18 +159,4 @@ public class ParserProcessor {
             index++;
         }
     }
-
-    public static void main(String[] args) throws Exception {
-//        var test =
-//                parse("{\n" +
-//                        "  \"name\": \"John Doe\",\n" +
-//                        "  \"age\": \"test\"\n" +
-//                        "  \"test\": -100.5\n" +
-//                        "  \"array\": [300,200,\"string\"]\n" +
-//                        "}");
-        var test =  parse("{\"user_name\":\"abc\",\"nestedObj\":{\"property2\":\"sde\",\"property1\":\"cfe\"},\"age\":10}");
-
-        System.out.println(test);
-    }
-
 }

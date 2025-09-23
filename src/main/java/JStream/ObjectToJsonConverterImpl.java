@@ -1,13 +1,14 @@
 package JStream;
 
 import Reflection.JsonAttribute;
-import Exception.JsonSerializationException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ObjectToJsonConverterImpl implements ObjectToJsonConverter {
-
+    private static final Logger logger = LogManager.getLogger(ObjectToJsonConverterImpl.class);
     private JsonData jsonData;
 
     public ObjectToJsonConverterImpl(JsonData jsonData) {
@@ -48,7 +49,7 @@ public class ObjectToJsonConverterImpl implements ObjectToJsonConverter {
                 }
             }
         } catch (IllegalAccessException e) {
-            throw new JsonSerializationException("Cannot serialize object", e);
+            logger.error("Cannot serialize object", e);
         }
     }
 
@@ -75,7 +76,7 @@ public class ObjectToJsonConverterImpl implements ObjectToJsonConverter {
                 }
             }
         } catch (IllegalAccessException e) {
-            throw new IllegalAccessException();
+            logger.error(e);
         }
 
         return valueReturned;
