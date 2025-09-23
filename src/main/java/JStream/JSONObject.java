@@ -15,7 +15,7 @@ public class JSONObject {
     }
 
     //parse from object to JsonObject
-    public JSONObject toJSONObject(Object instance) throws IllegalAccessException {
+    public JSONObject toJSONObject(Object instance) {
         return objectToJsonConverter.convert(instance);
     }
 

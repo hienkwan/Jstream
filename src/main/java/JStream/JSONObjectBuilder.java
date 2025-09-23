@@ -22,7 +22,7 @@ public class JSONObjectBuilder {
         return this;
     }
 
-    public JSONObjectBuilder withJsonString(String jsonString) throws Exception {
+    public JSONObjectBuilder withJsonString(String jsonString) {
         jsonParser = new JsonParserImpl(jsonData);
         jsonData.setData(jsonParser.parse(jsonString));
         return this;

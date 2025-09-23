@@ -10,6 +10,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 
+import Exception.InvalidJsonStringException;
+
 public class JsonParserImpl implements JsonParser {
     private static final Logger logger = LogManager.getLogger(JsonParserImpl.class);
     private JsonData jsonData;
@@ -19,13 +21,13 @@ public class JsonParserImpl implements JsonParser {
     }
 
     @Override
-    public Map<String, Object> parse(String jsonString) throws Exception {
-        Map<String, Object> data;
+    public Map<String, Object> parse(String jsonString) {
+        Map<String, Object> data = Map.of();
 
         try {
             data = ParserProcessor.parse(jsonString);
-        } catch (Exception ex) {
-            throw ex;
+        } catch (InvalidJsonStringException ex) {
+            logger.error(ex);
         }
 
         return data;
@@ -45,7 +47,6 @@ public class JsonParserImpl implements JsonParser {
         return null;
     }
 
-    //TODO adjust to parse data from Map to actual object
     //helper method to parse from json to object
     private <T> T parseJson(T instance) {
         for (var field : instance.getClass().getDeclaredFields()) {
@@ -73,7 +74,7 @@ public class JsonParserImpl implements JsonParser {
             }
 
             field.setAccessible(true);
-            logger.info("FieldType: {}",field.getType());
+            logger.info("FieldType: {}", field.getType());
             setFieldValue(instance, field, value);
         }
         return instance;
@@ -108,7 +109,7 @@ public class JsonParserImpl implements JsonParser {
                 }
                 parsedValue = (T) customObject;
             } catch (Exception e) {
-                throw new RuntimeException(e);
+                logger.error(e);
             }
         }
         logger.info("Parse Object: {}, field: {}, parsedValue: {}", object, field, value);
@@ -120,7 +121,7 @@ public class JsonParserImpl implements JsonParser {
         try {
             field.set(object, parsedValue);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            logger.error(e);
         }
     }
 }
